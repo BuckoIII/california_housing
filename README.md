@@ -1,5 +1,5 @@
-# titanic_survival
-repo for work on the kaggle challenge for likelihood of survival on the titanic
+# california_housing
+repo for work on prediction of housing prices in california using property attributes
 
 Project Organization
 ------------
