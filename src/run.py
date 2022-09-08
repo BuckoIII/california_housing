@@ -30,8 +30,6 @@ def run():
 
     n_models = len(configs)
 
-    prior_results_path = Path(Path('run.py').parent.absolute(), 'data', 'results.csv')
-    prior_results_df = pd.read_csv(prior_results_path)
 
     for i in range(n_models):
 
@@ -61,7 +59,6 @@ def run():
             model_names.append(model_name)
             preds.append(Y_hat[0])
 
-
             costs.append(cost_history[-1])
             mapes.append(mape(Y, Y_hat))
             rmses.append(rmse(Y, Y_hat))
@@ -72,7 +69,8 @@ def run():
     preds_df = pd.DataFrame(dict(zip(model_names, preds)))
     print(preds_df)
 
-    preds_path = Path(Path('run.py').parent.absolute(), 'data', 'predictions.csv')
+    preds_path = Path(Path.cwd().parent.absolute(), 'data', 'predictions.csv')
+    print(preds_path)
     preds_df.to_csv(preds_path)
 
     results_data = {'model_name': model_names,
@@ -84,7 +82,7 @@ def run():
                     'bias': biases}
     results_df = pd.DataFrame(results_data)
     print(results_df)
-    results_path = Path(Path('run.py').parent.absolute(), 'data', 'results.csv')
+    results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
     results_df.to_csv(results_path)
 
 
