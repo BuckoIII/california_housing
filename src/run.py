@@ -31,14 +31,17 @@ def run():
     n_models = len(configs)
 
 
-    for i in range(n_models):
+    last_updated, past_models = last_results_update()
 
+    for i in range(n_models):
             # set model vars
             model_name = configs[i][0]
             train_feat_func = configs[i][1]
             learning_rate = configs[i][2]
             num_iters = configs[i][3]
 
+            if model_name in past_models:
+                continue
 
             # set train vars
             X, Y, m, n = train_feat_func(train_df)
@@ -65,25 +68,28 @@ def run():
             train_times.append(train_time)
             weights.append(w_final)
             biases.append(b_final)
+            last_updates = [datetime.now() for i in range(n_models)]
 
-    preds_df = pd.DataFrame(dict(zip(model_names, preds)))
-    print(preds_df)
+    if costs:
+        preds_df = pd.DataFrame(dict(zip(model_names, preds)))
+        print(preds_df)
 
-    preds_path = Path(Path.cwd().parent.absolute(), 'data', 'predictions.csv')
-    print(preds_path)
-    preds_df.to_csv(preds_path)
+        preds_path = Path(Path.cwd().parent.absolute(), 'data', 'predictions.csv')
+        print(preds_path)
+        preds_df.to_csv(preds_path, index=False)
 
-    results_data = {'model_name': model_names,
-                    'cost': costs,
-                    'mape': mapes,
-                    'rmse': rmses,
-                    'train_time': train_times,
-                    'weight':weights,
-                    'bias': biases}
-    results_df = pd.DataFrame(results_data)
-    print(results_df)
-    results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
-    results_df.to_csv(results_path)
+        results_data = {'model_name': model_names,
+                        'cost': costs,
+                        'mape': mapes,
+                        'rmse': rmses,
+                        'train_time': train_times,
+                        'weight':weights,
+                        'bias': biases,
+                        'last_updated': last_updates}
+        results_df = pd.DataFrame(results_data)
+        print(results_df)
+        results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
+        results_df.to_csv(results_path, index=False)
 
 
 if __name__ == '__main__':
