@@ -9,8 +9,10 @@ import math
 import sklearn.datasets
 
 import math, copy
-
+from datetime import datetime
 import time
+
+
 
 
 
@@ -196,3 +198,21 @@ def scale_features(X):
     scaled_features = np.array([X.T[:][0] / max_features[i] for i in range(X.shape[1])]).T
 
     return max_features, scaled_features
+
+##############################################################################################################
+# def utils
+##############################################################################################################
+
+def results_exists():
+    results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
+    return results_path.is_file()
+
+def last_results_update():
+    results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
+    df = pd.read_csv(results_path)
+    last_updated = df.last_updated.max()
+    past_models = df.model_name.values
+    return last_updated, past_models
+
+
+
