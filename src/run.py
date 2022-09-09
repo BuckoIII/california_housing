@@ -13,7 +13,9 @@ def run():
     # model_name, train_feat_func, learning_rate, num_iters
     configs = [['lin_1', set_train_vars, 5 * 10 ** -7, 1500],
                ['lin_2', set_train_vars, 5 * 10 ** -7, 15],
-               ['lin_3', set_train_vars, 5 * 10 ** -7, 150]]
+               ['lin_3', set_train_vars, 5 * 10 ** -7, 150],
+               ['lin_4', set_train_vars, 5 * 10 ** -7, 150],
+               ['lin_5', set_train_vars, 5 * 10 ** -7, 150]]
 
     # todo:
     #  [] put all these lists in a cache
@@ -30,8 +32,8 @@ def run():
 
     n_models = len(configs)
 
-
-    last_updated, past_models = last_results_update()
+    if results_exists():
+        last_updated, past_models = last_results_update()
 
     for i in range(n_models):
             # set model vars
@@ -39,9 +41,10 @@ def run():
             train_feat_func = configs[i][1]
             learning_rate = configs[i][2]
             num_iters = configs[i][3]
-
-            if model_name in past_models:
-                continue
+            if results_exists():
+                if model_name in past_models:
+                    n_models -= 1
+                    continue
 
             # set train vars
             X, Y, m, n = train_feat_func(train_df)
@@ -71,12 +74,17 @@ def run():
             last_updates = [datetime.now() for i in range(n_models)]
 
     if costs:
-        preds_df = pd.DataFrame(dict(zip(model_names, preds)))
-        print(preds_df)
 
+        preds_df = pd.DataFrame(dict(zip(model_names, preds)))
         preds_path = Path(Path.cwd().parent.absolute(), 'data', 'predictions.csv')
-        print(preds_path)
-        preds_df.to_csv(preds_path, index=False)
+
+        if results_exists():
+            old_preds_df = pd.read_csv(preds_path)
+            updated_df = pd.concat(old_preds_df, preds_df)
+            updated_df.to_csv(preds_path, index=False)
+
+        else:
+            preds_df.to_csv(preds_path, index=False)
 
         results_data = {'model_name': model_names,
                         'cost': costs,
@@ -87,10 +95,19 @@ def run():
                         'bias': biases,
                         'last_updated': last_updates}
         results_df = pd.DataFrame(results_data)
-        print(results_df)
         results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
-        results_df.to_csv(results_path, index=False)
 
+        if results_exists():
+            old_results_df = pd.read_csv(results_path)
+            updated_results_df = pd.concat([old_results_df, results_df])
+            updated_results_df.to_csv(results_path, index=False)
+
+        else:
+            results_df.to_csv(results_path, index=False)
+
+    # print results / prediciotns for testing
+    # print(pd.read_csv(Path(Path.cwd().parent.absolute(), 'data', 'results.csv')))
+    # print(pd.read_csv(Path(Path.cwd().parent.absolute(), 'data', 'predictions.csv')).values.shape)
 
 if __name__ == '__main__':
     run()

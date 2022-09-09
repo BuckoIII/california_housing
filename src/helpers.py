@@ -203,6 +203,10 @@ def scale_features(X):
 # def utils
 ##############################################################################################################
 
+def results_exists():
+    results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
+    return results_path.is_file()
+
 def last_results_update():
     results_path = Path(Path.cwd().parent.absolute(), 'data', 'results.csv')
     df = pd.read_csv(results_path)
