@@ -11,15 +11,20 @@ def run():
 
     # load configs
     # model_name, train_feat_func, learning_rate, num_iters
-    configs = [['lin_1', set_train_vars, 5 * 10 ** -7, 1500],
-               ['lin_2', set_train_vars, 5 * 10 ** -7, 15],
-               ['lin_3', set_train_vars, 5 * 10 ** -7, 150],
-               ['lin_4', set_train_vars, 5 * 10 ** -7, 150],
-               ['lin_5', set_train_vars, 5 * 10 ** -7, 150]]
+    configs = [['lin_1', set_train_vars, 5 * 10 ** -7, 150000],
+               ['lin_2', set_train_vars, 5 * 10 ** -7, 1500],
+               ['lin_scaled_1', set_scaled_vars, 5 * 10 ** -3, 150],
+               ['lin_scaled_2', set_scaled_vars, 5 * 10 ** -3, 1500],
+               ['lin_scaled_3', set_scaled_vars, 5 * 10 ** -1.5, 15000],
+               ['lin_scaled_4', set_scaled_vars, 5 * 10 ** -7, 15000],
+               ['lin_scaled_5', set_scaled_vars, 5 * 10 ** -4, 15000]]
 
     # todo:
     #  [] put all these lists in a cache
-    #  [] write if statements to skip models which have already been run
+    #  [] turn config into .json/.yaml file
+    #  [] fix errors to preds csv save functionality
+    #     - logic has broken becuase predictions schema is different structure to results but currently am reating them in the same way
+    #       this means that new predictions are appending to the bottom of the scv rather than as new cols
 
     model_names  = []
     preds = []
@@ -80,8 +85,8 @@ def run():
 
         if results_exists():
             old_preds_df = pd.read_csv(preds_path)
-            updated_df = pd.concat(old_preds_df, preds_df)
-            updated_df.to_csv(preds_path, index=False)
+            updated_preds_df = pd.concat([old_preds_df, preds_df])
+            updated_preds_df.to_csv(preds_path, index=False)
 
         else:
             preds_df.to_csv(preds_path, index=False)

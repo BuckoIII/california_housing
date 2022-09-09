@@ -199,6 +199,12 @@ def scale_features(X):
 
     return max_features, scaled_features
 
+def set_scaled_vars(train_df):
+    X, Y, m, n = set_train_vars(train_df)
+    X_max_features, X = scale_features(X)
+    return X, Y, m, n
+
+
 ##############################################################################################################
 # def utils
 ##############################################################################################################
