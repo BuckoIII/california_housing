@@ -175,8 +175,12 @@ def set_test_vars(X_df):
     return X_test, Y_test, m, n
 
 
-def predict(X_in, w_arr, b_val):
-    Y_hat = np.dot(w_arr, X_in.T) + b_val
+def predict(X_in, w_arr, b_val, scale_func = None):
+
+    if scale_func:
+        Y_hat = np.dot(w_arr, scale_func(X_in.T)) + b_val
+    else:
+        Y_hat = np.dot(w_arr, X_in.T) + b_val
     return Y_hat
 
 
@@ -185,7 +189,7 @@ def rmse(Y, Y_hat):
 
 
 def mape(Y, Y_hat):
-    return np.mean((Y - Y_hat) / Y_hat)
+    return np.mean(abs((Y - Y_hat) / Y_hat))
 
 
 ##############################################################################################################
@@ -201,6 +205,11 @@ def scale_features(X):
 
 def set_scaled_vars(train_df):
     X, Y, m, n = set_train_vars(train_df)
+    X_max_features, X = scale_features(X)
+    return X, Y, m, n
+
+def set_scaled_test_vars(test_df):
+    X, Y, m, n = set_test_vars(test_df)
     X_max_features, X = scale_features(X)
     return X, Y, m, n
 
