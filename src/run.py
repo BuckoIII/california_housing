@@ -11,15 +11,18 @@ def run():
 
     # load configs
     # model_name, train_feat_func, learning_rate, num_iters
-    configs = [['lin_1', set_train_vars, 5 * 10 ** -7, 1500],
-               ['lin_2', set_train_vars, 5 * 10 ** -7, 15],
-               ['lin_3', set_train_vars, 5 * 10 ** -7, 150],
-               ['lin_4', set_train_vars, 5 * 10 ** -7, 150],
-               ['lin_5', set_train_vars, 5 * 10 ** -7, 150]]
+    configs = [['lin_1', set_train_vars, set_test_vars, 5 * 10 ** -7, 1500],
+               ['lin_2', set_train_vars, set_test_vars, 5 * 10 ** -7, 1500],
+               ['lin_scaled_1', set_scaled_vars, set_scaled_test_vars, 0.01, 1500],
+               ['lin_scaled_2', set_scaled_vars, set_scaled_test_vars, 0.05, 1500],
+               ['lin_scaled_3', set_scaled_vars, set_scaled_test_vars, 0.1, 1500],
+               ['lin_scaled_4', set_scaled_vars, set_scaled_test_vars, 0.5, 1500]]
 
     # todo:
     #  [] put all these lists in a cache
-    #  [] write if statements to skip models which have already been run
+    #  [] turn config into .json/.yaml file
+    #  [] fix feature scaling
+    #  [] polynomial regression features
 
     model_names  = []
     preds = []
@@ -39,8 +42,10 @@ def run():
             # set model vars
             model_name = configs[i][0]
             train_feat_func = configs[i][1]
-            learning_rate = configs[i][2]
-            num_iters = configs[i][3]
+            test_feat_func = configs[i][2]
+            learning_rate = configs[i][3]
+            num_iters = configs[i][4]
+
             if results_exists():
                 if model_name in past_models:
                     n_models -= 1
@@ -57,7 +62,7 @@ def run():
             print(f"b,w found by gradient descent: {b_final},{w_final} ")
 
             # set test vars
-            X, Y, m, n = set_test_vars(test_df)
+            X, Y, m, n = test_feat_func(test_df)
 
             # predict
             Y_hat = predict(X, w_final, b_final)
@@ -80,10 +85,11 @@ def run():
 
         if results_exists():
             old_preds_df = pd.read_csv(preds_path)
-            updated_df = pd.concat(old_preds_df, preds_df)
-            updated_df.to_csv(preds_path, index=False)
+            updated_preds_df = old_preds_df.join(preds_df)
+            updated_preds_df.to_csv(preds_path, index=False)
 
         else:
+            preds_df.insert(0,'test', Y)
             preds_df.to_csv(preds_path, index=False)
 
         results_data = {'model_name': model_names,
